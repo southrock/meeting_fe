@@ -1,7 +1,8 @@
 module.exports = {
   extends: [
-    'eslint-config-alloy/react',
-    'eslint-config-alloy/typescript',
+    'alloy',
+    'alloy/react',
+    'alloy/typescript',
   ],
   globals: {
     // 这里填入你的项目需要的全局变量
