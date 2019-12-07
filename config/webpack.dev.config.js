@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack');
 const config = require('./webpack.common.config');
-const host = process.env.HOST || '0.0.0.0';
+const host = process.env.HOST || 'localhost';
 config.mode = 'development';
 config.devtool = "inline-source-map";
 config.devServer = {
