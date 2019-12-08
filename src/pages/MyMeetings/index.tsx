@@ -46,9 +46,10 @@ const WrappedForm = Form.create<FormProps>({name:'meeting_form'})(FormComponent)
 
 const MyMeetings:React.FC = () => {
 
+  const [ ID,setID ] = useState<number>(undefined);
   const [ data,setData ] = useState([]);
 
-  const [ requires, setRequites ] = useState<string[]>([]);
+  const [ requires, setRequires ] = useState<string[]>([]);
   const [ visible, setVisible ] = useState<boolean>(false);
 
   const formRef = React.createRef<FormComponentProps>();
@@ -68,7 +69,8 @@ const MyMeetings:React.FC = () => {
     return (e:React.MouseEvent<HTMLAnchorElement,MouseEvent>) => {
       e.persist();
       e.preventDefault();
-      setRequites(record.requires);
+      setRequires(record.requires);
+      setID(record.id);
       setVisible(true);
     };
   };
@@ -78,8 +80,22 @@ const MyMeetings:React.FC = () => {
     form.validateFields((err,values) => {
       if (!err) {
         console.log(values);
-        message.success('提交成功');
-        setVisible(false);
+        axios.post('http://localhost:8080/api/user/meetings',{
+          username: 'sam',
+          id:ID,
+          data:values
+        })
+          .then((response) => {
+            console.log(response);
+            const { data, status } = response;
+            if (status === 200 && data.status === 1) {
+              message.success('提交成功');
+              setVisible(false);
+            }
+            else {
+              message.error(data.message);
+            }
+          });
       }
     });
   };
