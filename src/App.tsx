@@ -52,8 +52,8 @@ const App = () => {
       <RouteContainer>
         <Route exact path="/login" component={Login} />
         <PrivateRoute exact path="/" component={Home} />
-        <PrivateRoute exact path="/meeting/create" component={CreateMeeting} />
         <PrivateRoute exact path="/user/mymeetings" component={MyMeetings} />
+        <PrivateRoute exact path="/meeting/create" component={CreateMeeting} />
         <PrivateRoute exact path="/meeting/manage" component={ManageMeeting} />
       </RouteContainer>
     </Router>

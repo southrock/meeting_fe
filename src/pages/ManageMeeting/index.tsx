@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Table, Button, Popconfirm } from 'antd';
+import { Form, Table, Button, Popconfirm, Card, Row, message } from 'antd';
 import { ColumnProps } from 'antd/es/table';
 import moment from 'moment';
 import axios from 'axios';
@@ -12,6 +12,7 @@ interface MeetingProp {
   time: number;
   position: string;
   requires: string[];
+  data: {};
 }
 
 const ManageMeeting: React.FC = () => {
@@ -29,8 +30,22 @@ const ManageMeeting: React.FC = () => {
       });
   },[]);
 
-  const handleDelete = () => {
-
+  const handleDelete = (record:MeetingProp) => {
+    return () => {
+      axios.delete('http://localhost:8080/api/meetings',{
+        data: {
+          id: record.id
+        }
+      }).then((response) => {
+        const { data, status, statusText } = response;
+        if (status === 200 && data.status === 0 ) {
+          message.success(`会议 ${record.name} 删除成功`);
+        }
+        else {
+          message.error(data.message);
+        }
+      });
+    };
   };
 
   const handleEdit = () => {
@@ -64,7 +79,7 @@ const ManageMeeting: React.FC = () => {
           <>
             <Popconfirm
               title="你确定是否删除这个会议?"
-              onConfirm={handleDelete}
+              onConfirm={handleDelete(record)}
               okText="删除"
               cancelText="取消"
             >
@@ -79,11 +94,21 @@ const ManageMeeting: React.FC = () => {
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      rowKey="id"
-    />
+    <div>
+      <Row>会议管理</Row>
+      <Row>
+        <Card>
+          <Table
+            columns={columns}
+            dataSource={data}
+            rowKey="id"
+          />
+        </Card>
+      </Row>
+      <Row>
+        要求管理
+      </Row>
+    </div>
   );
 };
 
