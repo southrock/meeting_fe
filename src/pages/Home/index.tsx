@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, Row } from 'antd';
 
 import './style.css';
@@ -8,16 +9,13 @@ const Home = () => {
     <div className="index-container">
       <Card>
         <Row>
-          我的会议
+          <Link to="/user/mymeetings">我的会议</Link>
         </Row>
         <Row>
-          创建会议（organizer）
+          <Link to="/meeting/create">创建会议（organizer）</Link>
         </Row>
         <Row>
-          管理会议（admin）
-        </Row>
-        <Row>
-          设置要求（admin）
+          <Link to="/meeting/manage">管理会议（admin）</Link>
         </Row>
       </Card>
     </div>
