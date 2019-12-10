@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Form, Table, Button, Popconfirm, Card, Row, message, Modal,Input, DatePicker } from 'antd';
+import { Form, Table, Button, Popconfirm, Card, Row, message, Modal,Input, DatePicker, Select, Divider, Icon } from 'antd';
 import { ColumnProps } from 'antd/es/table';
 import { FormComponentProps } from 'antd/es/form';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import axios from 'axios';
 
 const { useState, useEffect } = React;
@@ -73,8 +73,17 @@ const WrappedFormComponent = Form.create<MeetingFormProps>({ name: 'meeting_form
 
 const ManageMeeting: React.FC = () => {
 
-  const [ data,setData ] = useState([]);
+  const [ meetingsData,setMeetingsData ] = useState([]);
+  const [ requires,setRequires ] = useState<string[]>([]);
+
   const [ nowRecord, setNowRecord ] = useState<MeetingProp>(undefined);
+
+  const [ isAdding, setIsAdding ] = useState<boolean>(false);
+  const [ selectedValue, setSelectedValue ] = useState<string>(undefined);
+  const [ inputValue, setInputValue ] = useState<string>('');
+  const [ dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const [ onBlurDisable, setOnBlurDisable] = useState<boolean>(false);
+
   const [ formModalVisible,setFormModalVisible ] = useState<boolean>(false);
   const [ tableModalVisible,setTableModalVisible ] = useState<boolean>(false);
 
@@ -85,8 +94,16 @@ const ManageMeeting: React.FC = () => {
       .then((response) => {
         const { data, status, statusText } = response;
         const { meetings } = data.data;
-        if (status === 200) {
-          setData(meetings);
+        if (status === 200 && data.status === 1) {
+          setMeetingsData(meetings);
+        }
+      });
+    axios.get('http://localhost:8080/api/requires')
+      .then((response) => {
+        const { data, status, statusText } = response;
+        const { requires } = data.data;
+        if (status === 200 && data.status === 1) {
+          setRequires(requires);
         }
       });
   },[]);
@@ -99,8 +116,15 @@ const ManageMeeting: React.FC = () => {
         }
       }).then((response) => {
         const { data, status, statusText } = response;
-        if (status === 200 && data.status === 0 ) {
+        if (status === 200 && data.status === 1 ) {
           message.success(`会议 ${record.name} 删除成功`);
+          console.log(meetingsData);
+          console.log(record);
+          const newData = meetingsData.filter((v:MeetingProp) => {
+            return v.id !== record.id;
+          });
+          setMeetingsData(newData);
+
         }
         else {
           message.error(data.message);
@@ -114,11 +138,25 @@ const ManageMeeting: React.FC = () => {
       if (!err) {
         const {
           name,
-          time,
           position
         } = formRef.current.form.getFieldsValue();
-        console.log(formRef.current.form.getFieldsValue());
-        // props.handleSubmitSuccess({name,time,position,attenders,requires});
+        const time:Moment = formRef.current.form.getFieldValue('time');
+        ;
+        const postData = {
+          id:nowRecord.id,
+          name,
+          time:time.valueOf(),
+          position
+        };
+        console.log(postData);
+        axios.put('http://localhost:8080/api/meetings',postData)
+          .then((response) => {
+            const { data, status } = response;
+            if (status === 200 && data.status === 1) {
+              message.success('修改成功');
+
+            }
+          });
       }
     });
   };
@@ -130,10 +168,63 @@ const ManageMeeting: React.FC = () => {
     };
   };
 
-  const handleCheck = () => {
-
+  const handleExcel = () => {
+    const head = [['用户名'].concat(nowRecord.requires)];
+    Object.keys(nowRecord.data).forEach((name) => {
+      head.push([name].concat(nowRecord.requires.map((v) => (nowRecord.data[name][v]))));
+    });
+    const csvRows:string[] = [];
+    head.forEach((row) => {
+      csvRows.push(row.join(','));
+    });
+    const csvString = csvRows.join('\n');
+    const _utf = '\uFEFF';
+    const link = document.createElement('a');
+    link.download = `${nowRecord.name}.csv`;
+    link.target = '_blank';
+    link.href= `data:attachment/csv; charset=utf-8,${_utf}${encodeURI(csvString)}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
+  const handleDeleteRequire = () => {
+    if (selectedValue !== undefined) {
+      console.log(selectedValue);
+      // axios.delete(`http://localhost:8080/api/requires?name=${selectedValue}`)
+      //   .then((response) => {
+      //     const { data, status } = response;
+      //     if (status === 200 && data.status === 1) {
+      //       message.success('删除成功');
+      //       const newRequires = [...requires];
+      //       newRequires.splice(newRequires.indexOf(selectedValue),1);
+
+      //       setRequires(newRequires);
+      //     }
+      //   });
+      const newRequires = [...requires];
+      newRequires.splice(newRequires.indexOf(selectedValue),1);
+      console.log(newRequires);
+      setRequires(newRequires);
+      setSelectedValue(undefined);
+    }
+  };
+
+
+  const handleAddRequire = () => {
+    // axios.post('http://localhost:8080/api/requires',{
+    //   name: inputValue
+    // })
+    //   .then((response) => {
+    //     const { data, status } = response;
+    //     if (status === 200 && data.status === 1) {
+    //       message.success('添加成功');
+    //       setRequires(requires.concat([inputValue]));
+    //     }
+    //   });
+    message.success('添加成功');
+    setRequires(requires.concat([inputValue]));
+  };
 
   const columns: ColumnProps<MeetingProp>[] = [
     {
@@ -183,13 +274,84 @@ const ManageMeeting: React.FC = () => {
         <Card>
           <Table
             columns={columns}
-            dataSource={data}
+            dataSource={meetingsData}
             rowKey="id"
           />
         </Card>
       </Row>
       <Row>
         要求管理
+      </Row>
+      <Row>
+        <Select
+          style={{ width: 200 }}
+          placeholder="选择一个要求"
+          open={dropdownOpen}
+          value={selectedValue}
+          onChange={(v:string) => setSelectedValue(v)}
+          onDropdownVisibleChange={open => {
+            if (!onBlurDisable) {
+              setDropdownOpen(open);
+            }
+          }}
+          dropdownRender={menu => (
+            <div>
+              {menu}
+              <Divider style={{ margin: '4px 0' }} />
+              <div
+                style={{ padding: '4px 8px', cursor: 'pointer' }}
+                onMouseEnter={() => setOnBlurDisable(true)}
+                onMouseLeave={() => setOnBlurDisable(false)}
+              >
+                {isAdding && (
+                  <div>
+                    <Input
+                      style={{ marginBottom: '10px' }}
+                      autoFocus
+                      onChange={(e) => setInputValue(e.target.value)}
+                    />
+
+                    <div>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          setIsAdding(false);
+                          setOnBlurDisable(false);
+                        }}
+                      >
+                    取消
+                      </Button>
+
+                      <Button
+                        size="small"
+                        type="primary"
+                        style={{ marginLeft: '10px' }}
+                        onClick={() => {
+                          setIsAdding(false);
+                          setOnBlurDisable(false);
+                          handleAddRequire();
+                        }}
+                      >
+                    保存
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {!isAdding && (
+                  <div onClick={() => setIsAdding(true)}>
+                    <Icon type="plus" /> 添加要求
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        >
+          {requires.map((require) => (
+            <Select.Option key={require} value={require} >{require}</Select.Option>
+          ))}
+        </Select>
+        <Button type="danger" onClick={handleDeleteRequire}>删除</Button>
       </Row>
       <Modal
         title="修改会议信息"
@@ -204,6 +366,7 @@ const ManageMeeting: React.FC = () => {
         title="与会人员信息"
         visible={tableModalVisible}
         okText="下载Excel表格"
+        onOk={handleExcel}
         onCancel={() => {setTableModalVisible(false)}}
       >
         <Table
