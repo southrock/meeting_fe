@@ -55,11 +55,11 @@ const MyMeetings:React.FC = () => {
   const formRef = React.createRef<FormComponentProps>();
 
   useEffect(()=>{
-    axios.get('http://localhost:8080/api/user/meetings?username=mike')
+    axios.get('http://localhost:8080/api/user/meetings')
       .then((response) => {
-        const { data, status, statusText } = response;
+        const { data, status } = response;
         const { meetings } = data.data;
-        if (status === 200) {
+        if (status === 200 && data.status === 1) {
           setData(meetings);
         }
       });
@@ -81,7 +81,6 @@ const MyMeetings:React.FC = () => {
       if (!err) {
         console.log(values);
         axios.post('http://localhost:8080/api/user/meetings',{
-          username: 'sam',
           id:ID,
           data:values
         })
