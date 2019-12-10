@@ -136,7 +136,7 @@ const CreateMeeting:React.FC = (props) => {
           setAllUsersArray(users);
         }
       });
-    axios.get('http://localhost:8080/api/meeting/register')
+    axios.get('http://localhost:8080/api/requires')
       .then((response) => {
         const { data, status, statusText } = response;
         const { requires } = data.data;
@@ -153,7 +153,7 @@ const CreateMeeting:React.FC = (props) => {
       time: data.time.valueOf()
     };
     console.log(postData);
-    axios.post('http://localhost:8080/api/meeting/register',postData,{
+    axios.post('http://localhost:8080/api/meetings',postData,{
       headers: {
         'Content-Type': 'application/json'
       }
