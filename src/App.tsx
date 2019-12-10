@@ -8,11 +8,18 @@ import MyMeetings from './pages/MyMeetings';
 import ManageMeeting from './pages/ManageMeeting';
 
 import './App.css';
+import { message } from 'antd';
 
 const { useState, useEffect } = React;
 
-const PrivateRoute = ({ component:Component, ...rest }: RouteProps) => {
-  const isAuth = true;
+interface MyRouteProps extends RouteProps {
+  auth: string[];
+}
+
+const PrivateRoute = ({ component:Component, ...rest }: MyRouteProps ) => {
+  const { auth } = rest;
+  const role = localStorage.getItem('role');
+  const isAuth = auth.includes(role);
   return (
     <Route
       {...rest}
@@ -24,7 +31,7 @@ const PrivateRoute = ({ component:Component, ...rest }: RouteProps) => {
         ) : (
           <Redirect
             to={{
-              pathname: '/',
+              pathname: '/login',
               state: { from: props.location }
             }}
           />
@@ -51,10 +58,10 @@ const App = () => {
     <Router>
       <RouteContainer>
         <Route exact path="/login" component={Login} />
-        <PrivateRoute exact path="/" component={Home} />
-        <PrivateRoute exact path="/user/mymeetings" component={MyMeetings} />
-        <PrivateRoute exact path="/meeting/create" component={CreateMeeting} />
-        <PrivateRoute exact path="/meeting/manage" component={ManageMeeting} />
+        <PrivateRoute exact path="/" component={Home} auth={['user','organizer','admin']} />
+        <PrivateRoute exact path="/user/mymeetings" component={MyMeetings} auth={['user','organizer','admin']} />
+        <PrivateRoute exact path="/meeting/create" component={CreateMeeting} auth={['organizer','admin']} />
+        <PrivateRoute exact path="/meeting/manage" component={ManageMeeting} auth={['admin']} />
       </RouteContainer>
     </Router>
   );
