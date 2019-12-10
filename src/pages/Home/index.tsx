@@ -4,7 +4,16 @@ import { Card, Row } from 'antd';
 
 import './style.css';
 
+
 const Home = () => {
+
+  const role = localStorage.getItem('role');
+
+  const handleLogout = () => {
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+  };
+
   return (
     <div className="index-container">
       <Card>
@@ -12,10 +21,13 @@ const Home = () => {
           <Link to="/user/mymeetings">我的会议</Link>
         </Row>
         <Row>
-          <Link to="/meeting/create">创建会议（organizer）</Link>
+          {['admin','organizer'].includes(role) && <Link to="/meeting/create">创建会议（organizer）</Link>}
         </Row>
         <Row>
-          <Link to="/meeting/manage">管理会议（admin）</Link>
+          {['admin'].includes(role) && <Link to="/meeting/manage">管理会议（admin）</Link>}
+        </Row>
+        <Row>
+          <Link to="/login" onClick={handleLogout}>退出登录</Link>
         </Row>
       </Card>
     </div>
