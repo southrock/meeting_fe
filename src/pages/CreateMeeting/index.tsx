@@ -153,7 +153,10 @@ const CreateMeeting:React.FC = (props) => {
       time: data.time.valueOf()
     };
     console.log(postData);
-    axios.post('http://localhost:8080/api/meetings',postData,{
+    axios.post('http://localhost:8080/api/meetings',{
+      organizer: localStorage.getItem('username'),
+      ...postData
+    },{
       headers: {
         'Content-Type': 'application/json'
       }

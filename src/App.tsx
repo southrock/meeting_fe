@@ -9,6 +9,7 @@ import ManageMeeting from './pages/ManageMeeting';
 
 import './App.css';
 import { message } from 'antd';
+import Signin from './pages/Signin';
 
 const { useState, useEffect } = React;
 
@@ -31,7 +32,7 @@ const PrivateRoute = ({ component:Component, ...rest }: MyRouteProps ) => {
         ) : (
           <Redirect
             to={{
-              pathname: '/login',
+              pathname: '/home',
               state: { from: props.location }
             }}
           />
@@ -58,10 +59,11 @@ const App = () => {
     <Router>
       <RouteContainer>
         <Route exact path="/login" component={Login} />
+        <Route exact path="/signin" component={Signin} />
         <PrivateRoute exact path="/" component={Home} auth={['user','organizer','admin']} />
         <PrivateRoute exact path="/user/mymeetings" component={MyMeetings} auth={['user','organizer','admin']} />
         <PrivateRoute exact path="/meeting/create" component={CreateMeeting} auth={['organizer','admin']} />
-        <PrivateRoute exact path="/meeting/manage" component={ManageMeeting} auth={['admin']} />
+        <PrivateRoute exact path="/meeting/manage" component={ManageMeeting} auth={['organizer','admin']} />
       </RouteContainer>
     </Router>
   );
