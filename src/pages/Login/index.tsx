@@ -2,7 +2,7 @@ import * as React from 'react';
 import axios from 'axios';
 import { Button, Card, Form, Row, Input, Icon, message  } from 'antd';
 import { FormComponentProps, FormProps } from 'antd/es/form';
-import { RouteComponentProps } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 
 const { useState } = React;
 
@@ -38,24 +38,27 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
     <Form onSubmit={handleSubmit}>
       <Form.Item>
         {getFieldDecorator('username', {
-          rules: [{ required: true, message: 'Please input your username!' }]
+          rules: [{ required: true, message: '请输入用户名！' }]
         })(
           <Input
             prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            placeholder="Username"
+            placeholder="用户名"
           />
         )}
       </Form.Item>
       <Form.Item>
         {getFieldDecorator('password', {
-          rules: [{ required: true, message: 'Please input your Password!' }]
+          rules: [{ required: true, message: '请输入密码！' }]
         })(
           <Input
             prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
             type="password"
-            placeholder="Password"
+            placeholder="密码"
           />
         )}
+      </Form.Item>
+      <Form.Item>
+        <Link to='/signin'>注册</Link>
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" className="login-form-button">
@@ -83,7 +86,9 @@ const Login = (props:RouteComponentProps) => {
         // 切换页面 授权
         localStorage.setItem('username',postData.username);
         localStorage.setItem('role',data.role);
-        props.history.push('/','success');
+        setTimeout(() => {
+          props.history.push('/','success');
+        },100);
       }
       else {
         message.error(data.message);
