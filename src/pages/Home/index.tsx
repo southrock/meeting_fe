@@ -21,10 +21,10 @@ const Home = () => {
           <Link to="/user/mymeetings">我的会议</Link>
         </Row>
         <Row>
-          {['admin','organizer'].includes(role) && <Link to="/meeting/create">创建会议（organizer）</Link>}
+          {['admin','organizer'].includes(role) && <Link to="/meeting/create">创建会议</Link>}
         </Row>
         <Row>
-          {['admin'].includes(role) && <Link to="/meeting/manage">管理会议（admin）</Link>}
+          {['admin','organizer'].includes(role) && <Link to="/meeting/manage">管理会议</Link>}
         </Row>
         <Row>
           <Link to="/login" onClick={handleLogout}>退出登录</Link>

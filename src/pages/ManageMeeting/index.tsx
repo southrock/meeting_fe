@@ -272,80 +272,85 @@ const ManageMeeting: React.FC = () => {
           />
         </Card>
       </Row>
-      <Row>
-        要求管理
-      </Row>
-      <Row>
-        <Select
-          style={{ width: 200 }}
-          placeholder="选择一个要求"
-          open={dropdownOpen}
-          value={selectedValue}
-          onChange={(v:string) => setSelectedValue(v)}
-          onDropdownVisibleChange={open => {
-            if (!onBlurDisable) {
-              setDropdownOpen(open);
-            }
-          }}
-          dropdownRender={menu => (
-            <div>
-              {menu}
-              <Divider style={{ margin: '4px 0' }} />
-              <div
-                style={{ padding: '4px 8px', cursor: 'pointer' }}
-                onMouseEnter={() => setOnBlurDisable(true)}
-                onMouseLeave={() => setOnBlurDisable(false)}
-              >
-                {isAdding && (
+      {
+        (localStorage.getItem('role') === 'admin')&&(
+          <>
+            <Row>
+            要求管理
+            </Row>
+            <Row>
+              <Select
+                style={{ width: 200 }}
+                placeholder="选择一个要求"
+                open={dropdownOpen}
+                value={selectedValue}
+                onChange={(v:string) => setSelectedValue(v)}
+                onDropdownVisibleChange={open => {
+                  if (!onBlurDisable) {
+                    setDropdownOpen(open);
+                  }
+                }}
+                dropdownRender={menu => (
                   <div>
-                    <Input
-                      style={{ marginBottom: '10px' }}
-                      autoFocus
-                      onChange={(e) => setInputValue(e.target.value)}
-                    />
+                    {menu}
+                    <Divider style={{ margin: '4px 0' }} />
+                    <div
+                      style={{ padding: '4px 8px', cursor: 'pointer' }}
+                      onMouseEnter={() => setOnBlurDisable(true)}
+                      onMouseLeave={() => setOnBlurDisable(false)}
+                    >
+                      {isAdding && (
+                        <div>
+                          <Input
+                            style={{ marginBottom: '10px' }}
+                            autoFocus
+                            onChange={(e) => setInputValue(e.target.value)}
+                          />
 
-                    <div>
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          setIsAdding(false);
-                          setOnBlurDisable(false);
-                        }}
-                      >
+                          <div>
+                            <Button
+                              size="small"
+                              onClick={() => {
+                                setIsAdding(false);
+                                setOnBlurDisable(false);
+                              }}
+                            >
                     取消
-                      </Button>
+                            </Button>
 
-                      <Button
-                        size="small"
-                        type="primary"
-                        style={{ marginLeft: '10px' }}
-                        onClick={() => {
-                          setIsAdding(false);
-                          setOnBlurDisable(false);
-                          handleAddRequire();
-                        }}
-                      >
+                            <Button
+                              size="small"
+                              type="primary"
+                              style={{ marginLeft: '10px' }}
+                              onClick={() => {
+                                setIsAdding(false);
+                                setOnBlurDisable(false);
+                                handleAddRequire();
+                              }}
+                            >
                     保存
-                      </Button>
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {!isAdding && (
+                        <div onClick={() => setIsAdding(true)}>
+                          <Icon type="plus" /> 添加要求
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
-
-                {!isAdding && (
-                  <div onClick={() => setIsAdding(true)}>
-                    <Icon type="plus" /> 添加要求
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        >
-          {requires.map((require) => (
-            <Select.Option key={require} value={require} >{require}</Select.Option>
-          ))}
-        </Select>
-        <Button type="danger" onClick={handleDeleteRequire}>删除</Button>
-      </Row>
+              >
+                {requires.map((require) => (
+                  <Select.Option key={require} value={require} >{require}</Select.Option>
+                ))}
+              </Select>
+              <Button type="danger" onClick={handleDeleteRequire}>删除</Button>
+            </Row>
+          </>)
+      }
       <Modal
         title="修改会议信息"
         visible={formModalVisible}
