@@ -1,6 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
-import { Table, Icon, Modal, Form, Input, message } from 'antd';
+import { Table, Icon, Modal, Form, Input, message, Button } from 'antd';
 import { ColumnProps } from 'antd/es/table';
 import { FormComponentProps } from 'antd/es/form';
 import moment from 'moment';
@@ -51,6 +51,7 @@ const MyMeetings:React.FC = () => {
 
   const [ requires, setRequires ] = useState<string[]>([]);
   const [ visible, setVisible ] = useState<boolean>(false);
+  const [ QRVisible, setQRVisible ] = useState<boolean>(false);
 
   const formRef = React.createRef<FormComponentProps>();
 
@@ -99,6 +100,13 @@ const MyMeetings:React.FC = () => {
     });
   };
 
+  const handleQRcode = (record:MeetingProp) => {
+    return () => {
+      setID(record.id);
+      setQRVisible(true);
+    };
+  };
+
   const columns: ColumnProps<MeetingProp>[] = [
     {
       title: '会议ID',
@@ -122,6 +130,11 @@ const MyMeetings:React.FC = () => {
       title: '是否填写信息',
       dataIndex: 'checked',
       render: v => (v === true ? <Icon type="check-circle" theme="twoTone" />: <Icon type="close-circle" theme="twoTone" />)
+    },
+    {
+      title: '操作',
+      dataIndex: 'action',
+      render: (_,record) => (<Button onClick={handleQRcode(record)}><Icon type="qrcode" /></Button>)
     }
   ];
 
@@ -143,6 +156,16 @@ const MyMeetings:React.FC = () => {
           wrappedComponentRef={formRef}
           requires={requires}
         />
+      </Modal>
+      <Modal
+        title="会议二维码"
+        visible={QRVisible}
+        footer={null}
+        onCancel={() => setQRVisible(false)}
+      >
+        <div style={{'textAlign':'center'}}>
+          <img src={`http://localhost:8080/api/qrcode?id=${ID}`} alt="我是二维码"/>
+        </div>
       </Modal>
     </div>
   );
