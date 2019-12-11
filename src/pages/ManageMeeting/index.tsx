@@ -190,40 +190,33 @@ const ManageMeeting: React.FC = () => {
 
   const handleDeleteRequire = () => {
     if (selectedValue !== undefined) {
-      console.log(selectedValue);
-      // axios.delete(`http://localhost:8080/api/requires?name=${selectedValue}`)
-      //   .then((response) => {
-      //     const { data, status } = response;
-      //     if (status === 200 && data.status === 1) {
-      //       message.success('删除成功');
-      //       const newRequires = [...requires];
-      //       newRequires.splice(newRequires.indexOf(selectedValue),1);
+      axios.delete(`http://localhost:8080/api/requires?name=${selectedValue}`)
+        .then((response) => {
+          const { data, status } = response;
+          if (status === 200 && data.status === 1) {
+            message.success('删除成功');
+            const newRequires = [...requires];
+            newRequires.splice(newRequires.indexOf(selectedValue),1);
 
-      //       setRequires(newRequires);
-      //     }
-      //   });
-      const newRequires = [...requires];
-      newRequires.splice(newRequires.indexOf(selectedValue),1);
-      console.log(newRequires);
-      setRequires(newRequires);
-      setSelectedValue(undefined);
+            setRequires(newRequires);
+            setSelectedValue(undefined);
+          }
+        });
     }
   };
 
 
   const handleAddRequire = () => {
-    // axios.post('http://localhost:8080/api/requires',{
-    //   name: inputValue
-    // })
-    //   .then((response) => {
-    //     const { data, status } = response;
-    //     if (status === 200 && data.status === 1) {
-    //       message.success('添加成功');
-    //       setRequires(requires.concat([inputValue]));
-    //     }
-    //   });
-    message.success('添加成功');
-    setRequires(requires.concat([inputValue]));
+    axios.post('http://localhost:8080/api/requires',{
+      name: inputValue
+    })
+      .then((response) => {
+        const { data, status } = response;
+        if (status === 200 && data.status === 1) {
+          message.success('添加成功');
+          setRequires(requires.concat([inputValue]));
+        }
+      });
   };
 
   const columns: ColumnProps<MeetingProp>[] = [
